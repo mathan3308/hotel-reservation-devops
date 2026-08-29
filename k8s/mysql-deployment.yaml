@@ -17,9 +17,26 @@ spec:
       labels:
         app: hotel-mysql
     spec:
+      initContainers:
+        - name: init-mysql-storage
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              if [ ! -d /var/lib/mysql/hotel_db ]; then
+                echo "Preparing empty volume for clean MySQL initialization..."
+                rm -rf /var/lib/mysql/* /var/lib/mysql/.[!.]* /var/lib/mysql/..?* 2>/dev/null || true
+              fi
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
       containers:
         - name: mysql
           image: mysql:8.0
+          args:
+            - "--default-authentication-plugin=mysql_native_password"
+            - "--skip-name-resolve"
           ports:
             - containerPort: 3306
               name: mysql
@@ -55,22 +72,21 @@ spec:
             exec:
               command:
                 - /bin/sh
-                - -i
                 - -c
-                - "mysqladmin ping -h localhost -u root -p${MYSQL_ROOT_PASSWORD}"
-            initialDelaySeconds: 15
+                - "mysqladmin ping -h 127.0.0.1 -u root -p$MYSQL_ROOT_PASSWORD"
+            initialDelaySeconds: 20
             periodSeconds: 10
             timeoutSeconds: 5
           livenessProbe:
             exec:
               command:
                 - /bin/sh
-                - -i
                 - -c
-                - "mysqladmin ping -h localhost -u root -p${MYSQL_ROOT_PASSWORD}"
+                - "mysqladmin ping -h 127.0.0.1 -u root -p$MYSQL_ROOT_PASSWORD"
             initialDelaySeconds: 30
             periodSeconds: 15
             timeoutSeconds: 5
+            failureThreshold: 5
           volumeMounts:
             - name: mysql-storage
               mountPath: /var/lib/mysql
