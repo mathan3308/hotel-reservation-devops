@@ -2,7 +2,7 @@ spring:
   application:
     name: hotel-reservation-backend
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
+    active: ${SPRING_PROFILES_ACTIVE:local}
 
 server:
   port: ${SERVER_PORT:8080}
