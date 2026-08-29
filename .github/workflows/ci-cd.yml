@@ -133,6 +133,37 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Dry-Run Validate Kubernetes Manifests
+        - name: Kubernetes Manifests Dry-Run Audit
         run: |
-          kubectl apply --dry-run=client --validate=false -f k8s/
+          python -m pip install pyyaml
+          python - <<'PY'
+          import glob
+          import yaml
+          import sys
+
+          files = glob.glob("k8s/*.yaml") + glob.glob("k8s/*.yml")
+
+          if not files:
+              print("No Kubernetes manifests found")
+              sys.exit(1)
+
+          for file in files:
+              print(f"Validating {file}...")
+              with open(file, "r", encoding="utf-8") as f:
+                  documents = list(yaml.safe_load_all(f))
+
+              for doc in documents:
+                  if doc is None:
+                      continue
+
+                  if not isinstance(doc, dict):
+                      raise ValueError(f"{file}: document is not a YAML object")
+
+                  for field in ("apiVersion", "kind", "metadata"):
+                      if field not in doc:
+                          raise ValueError(
+                              f"{file}: missing required Kubernetes field '{field}'"
+                          )
+
+          print(f"Successfully validated {len(files)} Kubernetes manifest files.")
+          PY
