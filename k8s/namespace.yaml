@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hotel-system
+  labels:
+    app.kubernetes.io/name: hotel-reservation-system
+    app.kubernetes.io/part-of: hotel-platform
