@@ -63,7 +63,8 @@ public class DataInitializer implements CommandLineRunner {
         logger.info("Checking database demo seed data initialization...");
 
         // 1. Seed Users
-        User admin = initUser("admin", "admin@hotel.com", "admin123", "System Administrator", "+1-800-555-0199", Role.ROLE_ADMIN);
+        User admin = initUser("mathan3308", "mathankumar3308@gmail.com", "Kiot@123", "Mathan Kumar (System Administrator)", "+1-800-555-0199", Role.ROLE_ADMIN);
+        initUser("admin", "admin@hotel.com", "Kiot@123", "System Administrator", "+1-800-555-0199", Role.ROLE_ADMIN);
         User staff = initUser("staff", "staff@hotel.com", "staff123", "Housekeeping Operations Lead", "+1-800-555-0144", Role.ROLE_STAFF);
         User customer = initUser("customer", "customer@hotel.com", "customer123", "Eleanor Vance", "+1-800-555-0188", Role.ROLE_CUSTOMER);
         initUser("john_doe", "john.doe@example.com", "customer123", "Johnathan Doe", "+1-800-555-0122", Role.ROLE_CUSTOMER);
@@ -146,7 +147,14 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private User initUser(String username, String email, String rawPassword, String fullName, String phone, Role role) {
-        return userRepository.findByUsername(username).orElseGet(() -> {
+        return userRepository.findByUsername(username).map(existing -> {
+            existing.setEmail(email);
+            existing.setPassword(passwordEncoder.encode(rawPassword));
+            existing.setFullName(fullName);
+            existing.setPhone(phone);
+            existing.setRole(role);
+            return userRepository.save(existing);
+        }).orElseGet(() -> {
             User user = new User(username, email, passwordEncoder.encode(rawPassword), fullName, phone, role);
             return userRepository.save(user);
         });

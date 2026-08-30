@@ -44,27 +44,28 @@ const Login = () => {
   };
 
   return (
-    <div className="container" style={{ padding: '4rem 1.5rem', maxWidth: '480px' }}>
-      <div className="card card-glass" style={{ padding: '2.5rem' }}>
+    <div className="container" style={{ padding: '3.5rem 1rem', maxWidth: '480px' }}>
+      <div className="card card-glass card-gold-glow" style={{ padding: '2.5rem 1.75rem', borderRadius: 'var(--radius-xl)' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>👑</div>
-          <h2 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>Account Sign In</h2>
+          <div className="logo-icon" style={{ margin: '0 auto 1rem', width: '54px', height: '54px', fontSize: '1.75rem' }}>👑</div>
+          <h2 style={{ fontSize: '1.85rem', marginBottom: '0.35rem' }}>Account Sign In</h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
             Access your bookings and hotel logistics management
           </p>
         </div>
 
-        {/* Demo Fast-Fill Buttons */}
-        <div style={{ background: 'rgba(217, 119, 6, 0.1)', border: '1px solid var(--border-accent)', padding: '0.75rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem' }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--gold-500)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.5rem', textAlign: 'center' }}>
+        {/* 1-Click Demo Accounts */}
+        <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid var(--border-accent)', padding: '0.85rem', borderRadius: 'var(--radius-md)', marginBottom: '1.75rem' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--gold-400)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.6rem', textAlign: 'center', letterSpacing: '0.08em' }}>
             ⚡ 1-Click Demo Accounts
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.4rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '0.45rem' }}>
             <button
               type="button"
-              onClick={() => setDemoCredentials('admin', 'admin123')}
-              className="btn btn-secondary btn-sm"
-              style={{ fontSize: '0.75rem', padding: '0.35rem 0.2rem' }}
+              onClick={() => setDemoCredentials('mathan3308', 'Kiot@123')}
+              className="btn btn-primary btn-sm"
+              style={{ fontSize: '0.75rem', padding: '0.45rem 0.2rem', minHeight: '36px' }}
+              title="mathan3308 / Kiot@123"
             >
               👑 Admin
             </button>
@@ -72,15 +73,17 @@ const Login = () => {
               type="button"
               onClick={() => setDemoCredentials('staff', 'staff123')}
               className="btn btn-secondary btn-sm"
-              style={{ fontSize: '0.75rem', padding: '0.35rem 0.2rem' }}
+              style={{ fontSize: '0.75rem', padding: '0.45rem 0.2rem', minHeight: '36px' }}
+              title="staff / staff123"
             >
               🧹 Staff
             </button>
             <button
               type="button"
-              onClick={() => setDemoCredentials('customer', 'customer123')}
+              onClick={() => setDemoCredentials('john_doe', 'customer123')}
               className="btn btn-secondary btn-sm"
-              style={{ fontSize: '0.75rem', padding: '0.35rem 0.2rem' }}
+              style={{ fontSize: '0.75rem', padding: '0.45rem 0.2rem', minHeight: '36px' }}
+              title="john_doe / customer123"
             >
               🏖 Guest
             </button>
@@ -93,7 +96,7 @@ const Login = () => {
             <input
               type="text"
               className="form-control"
-              placeholder="e.g. admin, staff, or customer"
+              placeholder="e.g. mathan3308 or mathankumar3308@gmail.com"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -113,13 +116,13 @@ const Login = () => {
           </div>
 
           <button type="submit" disabled={loading} className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }}>
-            {loading ? 'Authenticating...' : 'Sign In'}
+            {loading ? 'Authenticating...' : 'Sign In to Account →'}
           </button>
         </form>
 
-        <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+        <div style={{ textAlign: 'center', marginTop: '1.75rem', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
           Don't have an account yet?{' '}
-          <Link to="/register" style={{ fontWeight: 600 }}>
+          <Link to="/register" style={{ fontWeight: 700, color: 'var(--gold-400)' }}>
             Create Account
           </Link>
         </div>
