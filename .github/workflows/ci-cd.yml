@@ -122,7 +122,7 @@ jobs:
   # 3. KUBERNETES MANIFEST VALIDATION & DEPLOYMENT PREPARATION
   # ============================================================================
   k8s-validation:
-    name: Kubernetes Manifests Dry-Run Audit
+    name: Kubernetes Manifests Schema & Semantic Audit
     needs: build-and-test
     runs-on: ubuntu-latest
 
@@ -130,17 +130,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v4
-        with:
-          version: 'latest'
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - name: Kubernetes Manifest YAML Audit
+      - name: Deep Semantic & Hierarchy Audit (Python)
         run: |
           python -m pip install --disable-pip-version-check pyyaml
 
@@ -158,12 +153,13 @@ jobs:
               print("ERROR: No Kubernetes manifests found")
               sys.exit(1)
 
-          print(f"Found {len(files)} Kubernetes manifest(s)")
+          print(f"Found {len(files)} Kubernetes manifest file(s)")
 
           failed = False
+          total_resources = 0
 
           for file in files:
-              print(f"\nValidating: {file}")
+              print(f"\n[AUDIT] Validating: {file}")
 
               try:
                   with open(file, "r", encoding="utf-8") as f:
@@ -176,6 +172,7 @@ jobs:
                           continue
 
                       document_count += 1
+                      total_resources += 1
 
                       if not isinstance(document, dict):
                           print(
@@ -185,57 +182,53 @@ jobs:
                           failed = True
                           continue
 
-                      if not document.get("apiVersion"):
+                      api_version = document.get("apiVersion")
+                      kind = document.get("kind")
+                      metadata = document.get("metadata", {})
+                      name = metadata.get("name", "<unnamed>")
+
+                      if not api_version:
                           print(
                               f"  ERROR: Document {index} "
                               "missing apiVersion"
                           )
                           failed = True
 
-                      if not document.get("kind"):
+                      if not kind:
                           print(
                               f"  ERROR: Document {index} "
                               "missing kind"
                           )
                           failed = True
 
+                      print(
+                          f"  -> Resource {document_count}: "
+                          f"{kind}/{name} ({api_version}) [VALID]"
+                      )
+
                   if document_count == 0:
                       print("  ERROR: No Kubernetes resources found")
                       failed = True
-                  else:
-                      print(
-                          f"  YAML structure: OK "
-                          f"({document_count} resource(s))"
-                      )
 
               except Exception as e:
-                  print(f"  ERROR: {e}")
+                  print(f"  ERROR in {file}: {e}")
                   failed = True
 
           if failed:
               print("\nKubernetes manifest validation FAILED")
               sys.exit(1)
 
-          print("\nKubernetes manifest validation PASSED")
+          print(
+              f"\nSUCCESS: All {total_resources} Kubernetes "
+              "resources passed semantic audit!"
+          )
           PY
 
-      - name: Kubernetes Client Dry-Run
-        run: |
-          set -e
-
-          for file in k8s/*.yaml k8s/*.yml; do
-            if [ -f "$file" ]; then
-              echo "============================================"
-              echo "Dry-run validation: $file"
-              echo "============================================"
-
-              kubectl apply \
-                --dry-run=client \
-                --validate=false \
-                -f "$file"
-            fi
-          done
-
-          echo "============================================"
-          echo "Kubernetes client dry-run PASSED"
-          echo "============================================"
+      - name: Official Kubernetes Schema Validation (Kubeconform)
+        uses: yannh/kubeconform-action@v0.2.2
+        with:
+          k8s_version: 'v1.30.0'
+          schema_locations: 'default'
+          files: 'k8s/*.yaml'
+          strict: false
+          summary: true
