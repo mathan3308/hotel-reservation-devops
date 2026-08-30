@@ -225,10 +225,8 @@ jobs:
           PY
 
       - name: Official Kubernetes Schema Validation (Kubeconform)
-        uses: yannh/kubeconform-action@v0.2.2
-        with:
-          k8s_version: 'v1.30.0'
-          schema_locations: 'default'
-          files: 'k8s/*.yaml'
-          strict: false
-          summary: true
+        run: |
+          KUBECONFORM_VERSION="v0.6.7"
+          curl -sL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" | tar -xz
+          sudo mv kubeconform /usr/local/bin/
+          kubeconform -summary -kubernetes-version 1.30.0 -schema-location default k8s/*.yaml
