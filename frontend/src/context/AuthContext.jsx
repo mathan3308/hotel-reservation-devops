@@ -4,9 +4,16 @@ import { authApi } from '../services/api';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('hotel_jwt_token') || null);
-  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(() => localStorage.getItem('hotel_jwt_token') || null);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('hotel_user');
+    try {
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const initAuth = async () => {
@@ -15,7 +22,8 @@ export const AuthProvider = ({ children }) => {
 
       if (storedToken && storedUser) {
         try {
-          setUser(JSON.parse(storedUser));
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
           setToken(storedToken);
           // Refresh user profile in background
           const res = await authApi.getCurrentUser();
@@ -28,7 +36,6 @@ export const AuthProvider = ({ children }) => {
           logout();
         }
       }
-      setLoading(false);
     };
 
     initAuth();
@@ -69,8 +76,7 @@ export const AuthProvider = ({ children }) => {
 
   const isAdmin = user?.role === 'ROLE_ADMIN';
   const isStaff = user?.role === 'ROLE_STAFF';
-  const isCustomer = user?.role === 'ROLE_CUSTOMER';
-  const isAuthenticated = !!token;
+  const isAuthenticated = !!token && !!user;
 
   return (
     <AuthContext.Provider

@@ -60,13 +60,13 @@ const Navbar = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <Link to="/profile" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
                 <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'var(--gold-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#fff', fontSize: '0.85rem' }}>
-                  {user.fullName ? user.fullName.charAt(0).toUpperCase() : user.username.charAt(0).toUpperCase()}
+                  {user?.fullName ? user.fullName.charAt(0).toUpperCase() : (user?.username ? user.username.charAt(0).toUpperCase() : 'U')}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#fff', lineHeight: 1.2 }}>
-                    {user.fullName || user.username}
+                    {user?.fullName || user?.username || 'User'}
                   </span>
-                  <StatusBadge status={user.role} />
+                  {user?.role && <StatusBadge status={user.role} />}
                 </div>
               </Link>
               <button onClick={handleLogout} className="btn btn-outline btn-sm" title="Sign Out">
