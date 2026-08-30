@@ -76,6 +76,7 @@ export const AuthProvider = ({ children }) => {
 
   const isAdmin = user?.role === 'ROLE_ADMIN';
   const isStaff = user?.role === 'ROLE_STAFF';
+  const isCustomer = user?.role === 'ROLE_CUSTOMER';
   const isAuthenticated = !!token && !!user;
 
   return (
